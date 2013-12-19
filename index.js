@@ -65,9 +65,10 @@ module.exports = function (file) {
             if (node.type === 'CallExpression'
             && isFs(node.callee) && isRFS(node.callee.property)) {
                 var args = node.arguments;
-                var canBeInlined = !containsUndefinedVariable(args[0]);
-                
-                if (canBeInlined) {
+
+                if (containsUndefinedVariable(args[0])) {
+                    tr.emit('error', new Error('Undefined filename argument.'));
+                } else {
                     var t = 'return ' + unparse(args[0]);
                     var fpath = Function(vars, t)(file, dirname);
                     var enc = args[1]
